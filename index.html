@@ -1,1 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>関根商店新聞</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#123a5e">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+*{box-sizing:border-box;}
+body{margin:0;background:linear-gradient(#e9f2fb,#cfe3f5);min-height:100vh;font-family:Arial,"Hiragino Sans",sans-serif;padding-bottom:30px;}
+header{background:#123a5e;color:white;padding:20px 10px;text-align:center;position:relative;}
+header h1{font-size:24px;margin:0;}
+.gear{position:absolute;top:14px;right:14px;background:none;border:none;color:white;font-size:26px;cursor:pointer;}
+.wrap{max-width:640px;margin:0 auto;padding:18px;}
+.installBtn{display:none;width:100%;padding:20px;border:none;border-radius:16px;background:#ff9800;color:white;font-size:19px;font-weight:bold;margin-bottom:18px;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.iosGuide{display:none;margin-bottom:18px;background:#fff8e1;border:2px solid #ff9800;border-radius:12px;padding:14px;font-size:14px;line-height:1.6;color:#333;}
+.iosGuide button{float:right;background:none;border:none;font-size:16px;}
+.latestCard{background:white;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:28px 22px;text-align:center;margin-bottom:18px;}
+.latestLabel{font-size:15px;color:#888;font-weight:bold;margin-bottom:6px;}
+.latestNumber{font-size:44px;font-weight:bold;color:#123a5e;margin-bottom:18px;}
+.latestBtnGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.latestBtn{padding:18px;border:none;border-radius:14px;font-size:17px;font-weight:bold;color:white;}
+.latestBtn.read{background:#123a5e;grid-column:1/3;}
+.latestBtn.print{background:#555;}
+.latestBtn.line{background:#06c755;}
+.pastLabel{font-size:16px;font-weight:bold;color:#333;margin:20px 0 10px;}
+.issueCard{background:white;border-radius:18px;box-shadow:0 3px 10px rgba(0,0,0,.12);padding:20px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.issueLeft{flex:1;}
+.issueNumber{font-size:24px;font-weight:bold;color:#123a5e;}
+.issueDate{font-size:15px;color:#666;margin-top:4px;}
+.readBtn{background:#123a5e;color:white;border:none;border-radius:12px;padding:14px 20px;font-size:16px;font-weight:bold;flex-shrink:0;}
+.empty{text-align:center;color:#888;font-size:16px;margin-top:40px;}
 
+.settingsScreen{display:none;position:fixed;inset:0;background:#eef3f8;z-index:999;overflow-y:auto;}
+.settingsScreen.show{display:block;}
+.setHeader{background:#123a5e;color:white;padding:18px 10px;text-align:center;position:relative;}
+.setHeader h2{font-size:20px;margin:0;}
+.closeSet{position:absolute;top:14px;left:14px;background:none;border:none;color:white;font-size:26px;cursor:pointer;}
+.setBox{max-width:640px;margin:20px auto;background:white;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.setBox label{display:block;font-size:15px;font-weight:bold;margin-bottom:6px;color:#333;}
+.setBox input{width:100%;font-size:17px;padding:12px;border-radius:10px;border:1px solid #aaa;margin-bottom:14px;}
+.addBtn{width:100%;padding:16px;border:none;border-radius:14px;font-size:17px;font-weight:bold;color:white;background:#2e9d45;margin-bottom:20px;}
+.savedMsg{display:none;background:#e8f8ec;color:#1b7d34;border:2px solid #2e9d45;border-radius:12px;padding:12px;text-align:center;font-size:15px;font-weight:bold;margin-bottom:14px;}
+.existingItem{display:flex;align-items:center;justify-content:space-between;background:#f5f5f5;border-radius:10px;padding:10px 14px;margin-bottom:8px;}
+.existingItem .info{font-size:14px;color:#333;}
+.existingItem button{background:none;border:none;color:#e53935;font-size:18px;}
+.hint{font-size:13px;color:#777;line-height:1.6;margin-bottom:16px;background:#fdf4e3;border-radius:10px;padding:10px 12px;}
+</style>
+</head>
+<body>
+
+<header>
+<h1>📰 関根商店新聞</h1>
+<button class="gear" onclick="openSettings()">⚙️</button>
+</header>
+
+<div class="wrap">
+<button class="installBtn" id="installBtn" onclick="installApp()">📲 アプリを追加する</button>
+<div class="iosGuide" id="iosInstallGuide">
+📲 <b>iPhoneでホーム画面に追加</b><br>
+①下の<b>共有ボタン</b>をタップ → ②「ホーム画面に追加」を選ぶ
+<button onclick="document.getElementById('iosInstallGuide').style.display='none';">✕</button>
+</div>
+
+<div class="latestCard" id="latestCard" style="display:none;">
+<div class="latestLabel">最新号</div>
+<div class="latestNumber" id="latestNumber"></div>
+<div class="latestBtnGrid">
+<button class="latestBtn read" onclick="readLatest()">📖 読む</button>
+<button class="latestBtn print" onclick="printLatest()">🖨 印刷</button>
+<button class="latestBtn line" onclick="shareLatestLine()">📱 ライン</button>
+</div>
+</div>
+
+<div class="pastLabel" id="pastLabel" style="display:none;">バックナンバー</div>
+<div id="issueList"></div>
+</div>
+
+<iframe id="printFrame" style="display:none;"></iframe>
+
+<!-- 設定画面 -->
+<div class="settingsScreen" id="settingsScreen">
+<div class="setHeader">
+<button class="closeSet" onclick="closeSettings()">←</button>
+<h2>新しい号を追加</h2>
+</div>
+
+<div class="setBox">
+<div class="savedMsg" id="savedMsg">✅ 追加しました</div>
+
+<div class="hint">
+①まずPDFファイルをこのリポジトリにアップロードしてください<br>
+②アップロードしたファイル名を、下の「PDFファイル名」にそのまま入力してください(例：sekine-shinbun-35.pdf)
+</div>
+
+<label>号数</label>
+<input type="number" id="inputNumber" placeholder="例：35">
+
+<label>PDFファイル名</label>
+<input type="text" id="inputFile" placeholder="例：sekine-shinbun-35.pdf">
+
+<button class="addBtn" onclick="addIssue()">➕ 追加する</button>
+
+<label>登録済みの号</label>
+<div id="existingList"></div>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={
+apiKey:"AIzaSyD99MxOMnGplSQjV7830bS7-gdCBSM9DGY",
+authDomain:"sekine-store.firebaseapp.com",
+projectId:"sekine-store",
+storageBucket:"sekine-store.firebasestorage.app",
+messagingSenderId:"781856496751",
+appId:"1:781856496751:web:e2e1e5de4cd803415a819a"
+};
+if(!firebase.apps.length){firebase.initializeApp(firebaseConfig);}
+const db=firebase.firestore();
+const docRef=db.collection("shinbun").doc("issues");
+
+let issueCache=[];
+
+function escapeHtml(s){
+return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function formatDate(dateStr){
+if(!dateStr)return "";
+const parts=dateStr.split("-");
+if(parts.length!==3)return dateStr;
+return parts[0]+"年"+Number(parts[1])+"月"+Number(parts[2])+"日";
+}
+
+let latestIssue=null;
+
+function renderIssueList(){
+const box=document.getElementById("issueList");
+const latestCard=document.getElementById("latestCard");
+const pastLabel=document.getElementById("pastLabel");
+
+if(!issueCache || issueCache.length===0){
+latestCard.style.display="none";
+pastLabel.style.display="none";
+box.innerHTML="<div class='empty'>まだ新聞が登録されていません</div>";
+latestIssue=null;
+return;
+}
+
+const sorted=issueCache.slice().sort(function(a,b){return b.number-a.number;});
+latestIssue=sorted[0];
+document.getElementById("latestNumber").textContent="第"+latestIssue.number+"号";
+latestCard.style.display="block";
+
+const rest=sorted.slice(1);
+if(rest.length===0){
+pastLabel.style.display="none";
+box.innerHTML="";
+return;
+}
+pastLabel.style.display="block";
+box.innerHTML=rest.map(function(item){
+return "<div class='issueCard'>"+
+"<div class='issueLeft'>"+
+"<div class='issueNumber'>第"+escapeHtml(item.number)+"号</div>"+
+"</div>"+
+"<button class='readBtn' onclick=\"window.open('"+encodeURI(item.file)+"','_blank')\">読む</button>"+
+"</div>";
+}).join("");
+}
+
+function readLatest(){
+if(!latestIssue)return;
+window.open(encodeURI(latestIssue.file),"_blank");
+}
+
+function printLatest(){
+if(!latestIssue)return;
+const frame=document.getElementById("printFrame");
+frame.onload=function(){
+try{
+frame.contentWindow.focus();
+frame.contentWindow.print();
+}catch(e){
+window.open(encodeURI(latestIssue.file),"_blank");
+}
+};
+frame.src=encodeURI(latestIssue.file);
+}
+
+function shareLatestLine(){
+if(!latestIssue)return;
+const fullUrl=new URL(latestIssue.file, window.location.href).href;
+const text="📰 関根商店新聞 第"+latestIssue.number+"号\n"+fullUrl;
+const url="https://line.me/R/msg/text/?"+encodeURIComponent(text);
+window.open(url,"_blank");
+}
+
+function renderExistingList(){
+const box=document.getElementById("existingList");
+if(!issueCache || issueCache.length===0){
+box.innerHTML="<div style='color:#999;font-size:14px;'>まだありません</div>";
+return;
+}
+const sorted=issueCache.slice().sort(function(a,b){return b.number-a.number;});
+box.innerHTML=sorted.map(function(item){
+const idx=issueCache.indexOf(item);
+return "<div class='existingItem'>"+
+"<div class='info'>第"+escapeHtml(item.number)+"号</div>"+
+"<button onclick='deleteIssue("+idx+")'>🗑</button>"+
+"</div>";
+}).join("");
+}
+
+function loadIssues(){
+docRef.get().then(function(snap){
+issueCache=(snap.exists && Array.isArray(snap.data().list))?snap.data().list:[];
+renderIssueList();
+}).catch(function(){
+issueCache=[];
+renderIssueList();
+});
+}
+
+function saveIssues(){
+docRef.set({list:issueCache}).catch(function(){
+alert("保存に失敗しました。通信を確認してください。");
+});
+}
+
+function addIssue(){
+const number=document.getElementById("inputNumber").value.trim();
+const file=document.getElementById("inputFile").value.trim();
+if(!number || !file){
+alert("号数とPDFファイル名を入力してください");
+return;
+}
+issueCache.push({number:Number(number),file:file});
+renderIssueList();
+renderExistingList();
+saveIssues();
+document.getElementById("inputNumber").value="";
+document.getElementById("inputFile").value="";
+const msg=document.getElementById("savedMsg");
+msg.style.display="block";
+setTimeout(function(){msg.style.display="none";},2500);
+}
+
+function deleteIssue(index){
+if(!confirm("この号を削除しますか？"))return;
+issueCache.splice(index,1);
+renderIssueList();
+renderExistingList();
+saveIssues();
+}
+
+function openSettings(){
+document.getElementById("settingsScreen").classList.add("show");
+renderExistingList();
+}
+function closeSettings(){
+document.getElementById("settingsScreen").classList.remove("show");
+}
+
+function isIos(){
+return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
+function isStandalone(){
+return window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
+}
+
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",function(e){
+e.preventDefault();
+deferredPrompt=e;
+document.getElementById("installBtn").style.display="block";
+});
+
+function installApp(){
+if(!deferredPrompt)return;
+deferredPrompt.prompt();
+deferredPrompt.userChoice.then(function(){
+deferredPrompt=null;
+document.getElementById("installBtn").style.display="none";
+});
+}
+
+window.addEventListener("appinstalled",function(){
+document.getElementById("installBtn").style.display="none";
+});
+
+document.addEventListener("DOMContentLoaded",function(){
+loadIssues();
+if(isStandalone()){
+document.getElementById("installBtn").style.display="none";
+}else if(isIos()){
+document.getElementById("iosInstallGuide").style.display="block";
+}
+});
+
+if("serviceWorker" in navigator){
+window.addEventListener("load",function(){
+navigator.serviceWorker.register("service-worker.js").catch(function(){});
+});
+}
+</script>
+</body>
+</html>
