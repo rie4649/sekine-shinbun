@@ -21,9 +21,9 @@ header h1{font-size:24px;margin:0;}
 .latestCard{background:white;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:28px 22px;text-align:center;margin-bottom:18px;}
 .latestLabel{font-size:15px;color:#888;font-weight:bold;margin-bottom:6px;}
 .latestNumber{font-size:44px;font-weight:bold;color:#123a5e;margin-bottom:18px;}
-.latestPdfFrame{width:100%;height:75vh;border:1px solid #ddd;border-radius:12px;margin-bottom:18px;}
 .latestBtnGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .latestBtn{padding:18px;border:none;border-radius:14px;font-size:17px;font-weight:bold;color:white;}
+.latestBtn.read{background:#123a5e;grid-column:1/3;}
 .latestBtn.print{background:#555;}
 .latestBtn.line{background:#06c755;}
 .pastLabel{font-size:16px;font-weight:bold;color:#333;margin:20px 0 10px;}
@@ -74,8 +74,8 @@ header h1{font-size:24px;margin:0;}
 <div class="latestCard" id="latestCard" style="display:none;">
 <div class="latestLabel">最新号</div>
 <div class="latestNumber" id="latestNumber"></div>
-<iframe id="latestPdfFrame" class="latestPdfFrame"></iframe>
 <div class="latestBtnGrid">
+<button class="latestBtn read" onclick="readLatest()">📖 読む</button>
 <button class="latestBtn print" onclick="printLatest()">🖨 印刷</button>
 <button class="latestBtn line" onclick="shareLatestLine()">📱 ライン</button>
 </div>
@@ -184,7 +184,6 @@ return;
 const sorted=issueCache.slice().sort(function(a,b){return b.number-a.number;});
 latestIssue=sorted[0];
 document.getElementById("latestNumber").textContent="第"+latestIssue.number+"号";
-document.getElementById("latestPdfFrame").src=encodeURI(latestIssue.file)+"#toolbar=0&navpanes=0&view=FitH";
 latestCard.style.display="block";
 
 const rest=sorted.slice(1);
