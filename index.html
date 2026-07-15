@@ -104,8 +104,21 @@ header h1{font-size:24px;margin:0;}
 
 <button class="addBtn" onclick="addIssue()">➕ 追加する</button>
 
+<div class="hint" style="background:#e8f0fb;">
+「関根新聞第◯号.pdf」という名前で統一されている場合、まとめて登録できます。
+</div>
+<label>まとめて登録（開始号 〜 終了号）</label>
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
+<input type="number" id="bulkStart" placeholder="開始（例：1）" style="margin-bottom:0;">
+<span>〜</span>
+<input type="number" id="bulkEnd" placeholder="終了（例：34）" style="margin-bottom:0;">
+</div>
+<button class="addBtn" style="background:#123a5e;" onclick="bulkAddIssues()">📦 まとめて登録する</button>
+
 <label>登録済みの号</label>
 <div id="existingList"></div>
+
+<button class="addBtn" style="background:#888;margin-top:16px;margin-bottom:0;" onclick="closeSettings()">← 戻る</button>
 </div>
 </div>
 
@@ -257,6 +270,32 @@ issueCache.splice(index,1);
 renderIssueList();
 renderExistingList();
 saveIssues();
+}
+
+function bulkAddIssues(){
+const start=Number(document.getElementById("bulkStart").value);
+const end=Number(document.getElementById("bulkEnd").value);
+if(!start || !end || start>end){
+alert("開始号と終了号を正しく入力してください");
+return;
+}
+const existingNumbers=issueCache.map(function(item){return item.number;});
+let addedCount=0;
+for(let n=start;n<=end;n++){
+if(existingNumbers.indexOf(n)!==-1)continue;
+const fileName="関根新聞第"+n+"号.pdf";
+issueCache.push({number:n,file:fileName});
+addedCount++;
+}
+renderIssueList();
+renderExistingList();
+saveIssues();
+document.getElementById("bulkStart").value="";
+document.getElementById("bulkEnd").value="";
+const msg=document.getElementById("savedMsg");
+msg.textContent="✅ "+addedCount+"件登録しました";
+msg.style.display="block";
+setTimeout(function(){msg.style.display="none";msg.textContent="✅ 追加しました";},2500);
 }
 
 function openSettings(){
